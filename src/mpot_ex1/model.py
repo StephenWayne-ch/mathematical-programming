@@ -25,7 +25,15 @@ def create_model(model: gp.Model):
 
     # create common constraints
     # see, e.g., https://docs.gurobi.com/projects/optimizer/en/current/reference/python/model.html#Model.addConstr
+    for i in nodes:
+    model.addConstr(
+        gp.quicksum(x[i, j] for j in nodes if j != i) == 1
+    )
 
+    for i in nodes:
+    model.addConstr(
+        gp.quicksum(x[j, i] for j in nodes if j != i) == 1
+    )
     # TODO add common constraints here
 
     # create model-specific variables and constraints
