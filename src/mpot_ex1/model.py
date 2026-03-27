@@ -7,7 +7,7 @@ def create_model(model: gp.Model):
     graph: nx.DiGraph = model._graph
     formulation: str = model._formulation
 
-    # see, e.g., https://docs.gurobi.com/projects/optimizer/en/current/reference/python.html TES
+    # see, e.g., https://docs.gurobi.com/projects/optimizer/en/current/reference/python.html TE
 
     print(f"{graph.number_of_nodes()=}, {graph.number_of_edges()=}")
 
@@ -57,3 +57,4 @@ def create_model(model: gp.Model):
         gp.quicksum(graph[i][j]["weight"] * x[i, j] for i, j in x),
         GRB.MINIMIZE
     )
+#test
