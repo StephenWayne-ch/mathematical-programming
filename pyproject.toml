@@ -1,0 +1,18 @@
+[project]
+name = "mpot-ex1"
+version = "1.0.0"
+description = "Code template for MPOT, exercise sheet 1"
+readme = "README.md"
+authors = [
+    { name = "Georg Brandstätter", email = "georg.brandstaetter@tuwien.ac.at" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "gurobipy==13.0.1",
+    "networkx>=2.8.8",
+    "tsplib95>=0.7.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.10.11,<0.11.0"]
+build-backend = "uv_build"
