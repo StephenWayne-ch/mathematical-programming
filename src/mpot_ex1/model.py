@@ -34,7 +34,13 @@ def create_model(model: gp.Model):
 
     # SEQ
     if formulation == "seq":
+        u = model.addVars([i for i in nodes if i != 1], lb=1, ub=n - 1, vtype=GRB.CONTINUOUS, name="u")
+        model._u = u
         
+        for i in nodes:
+            for j in nodes:
+                if i != j and i != 1 and j != 1:
+                    model.addConstr(u[i] + x[i, j] <= u[j] + (n - 2) * (1 - x[i, j]), name=f"mtz_{i}_{j}")        
         pass
 
     # SCF
@@ -46,3 +52,8 @@ def create_model(model: gp.Model):
     elif formulation == "mcf":
         # TODO add your MCF constraints here
         pass
+
+    model.setObjective(
+        gp.quicksum(graph[i][j]["weight"] * x[i, j] for i, j in x),
+        GRB.MINIMIZE
+    )
