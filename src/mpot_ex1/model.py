@@ -15,7 +15,9 @@ def create_model(model: gp.Model):
     # see, e.g., https://docs.gurobi.com/projects/optimizer/en/current/reference/python/model.html#Model.addVars
 
     # TODO add your common variables here
+    nodes = list(graph.nodes())
     x = model.addVars([(i, j) for i in nodes for j in nodes if i != j], vtype=GRB.BINARY, name="x")
+    model._x = x
     # add reference to relevant variables for later use outside this function (e.g., reading solutions)
 
     # TODO create references to your common variables
