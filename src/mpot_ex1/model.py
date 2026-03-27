@@ -7,7 +7,7 @@ def create_model(model: gp.Model):
     graph: nx.DiGraph = model._graph
     formulation: str = model._formulation
 
-    # see, e.g., https://docs.gurobi.com/projects/optimizer/en/current/reference/python.html
+    # see, e.g., https://docs.gurobi.com/projects/optimizer/en/current/reference/python.html TEST
 
     print(f"{graph.number_of_nodes()=}, {graph.number_of_edges()=}")
 
