@@ -45,7 +45,7 @@ def create_model(model: gp.Model):
         pass
 
     # SCF
-    elif formulation == "scf":S
+    elif formulation == "scf":
         f = model.addVars([(i, j) for i in nodes for j in nodes if i != j], lb=0, ub=n - 1, vtype=GRB.CONTINUOUS, name="f")
         model._f = f
 
