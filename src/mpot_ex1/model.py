@@ -16,6 +16,7 @@ def create_model(model: gp.Model):
 
     # TODO add your common variables here
     nodes = list(graph.nodes())
+    n = len(nodes)
     x = model.addVars([(i, j) for i in nodes for j in nodes if i != j], vtype=GRB.BINARY, name="x")
     model._x = x
     # add reference to relevant variables for later use outside this function (e.g., reading solutions)
@@ -57,4 +58,3 @@ def create_model(model: gp.Model):
         gp.quicksum(graph[i][j]["weight"] * x[i, j] for i, j in x),
         GRB.MINIMIZE
     )
-#test
