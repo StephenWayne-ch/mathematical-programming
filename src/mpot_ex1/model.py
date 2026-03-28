@@ -45,8 +45,18 @@ def create_model(model: gp.Model):
         pass
 
     # SCF
-    elif formulation == "scf":
-        # TODO add your SCF constraints here
+    elif formulation == "scf":S
+        f = model.addVars([(i, j) for i in nodes for j in nodes if i != j], lb=0, ub=n - 1, vtype=GRB.CONTINUOUS, name="f")
+        model._f = f
+
+        model.addConstr(gp.quicksum(f[1, j] for j in nodes if j != 1) == n - 1, name="flow_source")
+
+        for i in nodes:
+            if i != 1:
+                model.addConstr(gp.quicksum(f[j, i] for j in nodes if j != i) - gp.quicksum(f[i, j] for j in nodes if j != i) == 1, name=f"flow_cons_{i}")
+
+        for i, j in x:
+            model.addConstr(f[i, j] <= (n - 1) * x[i, j], name=f"cap_{i}_{j}")
         pass
 
     # MCF
