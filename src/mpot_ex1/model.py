@@ -11,7 +11,7 @@ def create_model(model: gp.Model):
 
     print(f"{graph.number_of_nodes()=}, {graph.number_of_edges()=}")
 
-    # create common variables
+    # common variables
     # see, e.g., https://docs.gurobi.com/projects/optimizer/en/current/reference/python/model.html#Model.addVars
 
     # TODO add your common variables here
@@ -24,16 +24,13 @@ def create_model(model: gp.Model):
     # TODO create references to your common variables
     # m._x = x
 
-    # create common constraints
+    # common constraints
     # see, e.g., https://docs.gurobi.com/projects/optimizer/en/current/reference/python/model.html#Model.addConstr
     for i in nodes:
         model.addConstr(gp.quicksum(x[i, j] for j in nodes if j != i) == 1)
         model.addConstr(gp.quicksum(x[j, i] for j in nodes if j != i) == 1)
     # TODO add common constraints here
 
-    # create model-specific variables and constraints
-
-    # SEQ
     if formulation == "seq":
         u = model.addVars([i for i in nodes if i != 1], lb=1, ub=n - 1, vtype=GRB.CONTINUOUS, name="u")
         model._u = u
@@ -44,7 +41,6 @@ def create_model(model: gp.Model):
                     model.addConstr(u[i] + x[i, j] <= u[j] + (n - 2) * (1 - x[i, j]), name=f"mtz_{i}_{j}")        
         pass
 
-    # SCF
     elif formulation == "scf":
         f = model.addVars([(i, j) for i in nodes for j in nodes if i != j], lb=0, ub=n - 1, vtype=GRB.CONTINUOUS, name="f")
         model._f = f
@@ -59,9 +55,37 @@ def create_model(model: gp.Model):
             model.addConstr(f[i, j] <= (n - 1) * x[i, j], name=f"cap_{i}_{j}")
         pass
 
-    # MCF
     elif formulation == "mcf":
-        # TODO add your MCF constraints here
+
+        commodities = [k for k in nodes if k != 1]
+        f = model.addVars([(i, j, k) for i in nodes for j in nodes for k in commodities if i != j], lb=0, ub=1, vtype=GRB.CONTINUOUS, name="f")
+        model._f = f
+
+        for k in commodities:
+            model.addConstr(
+                gp.quicksum(f[1, j, k] for j in nodes if j != 1)
+                - gp.quicksum(f[j, 1, k] for j in nodes if j != 1)
+                == 1,
+                name=f"source_{k}"
+            )
+
+        for k in commodities:
+            model.addConstr(
+                gp.quicksum(f[k, j, k] for j in nodes if j != k)
+                - gp.quicksum(f[j, k, k] for j in nodes if j != k)
+                == -1,
+                name=f"sink_{k}"
+            )
+
+        for k in commodities:
+            for i in nodes:
+                if i != 1 and i != k:
+                    model.addConstr(gp.quicksum(f[i, j, k] for j in nodes if j != i) - gp.quicksum(f[j, i, k] for j in nodes if j != i) == 0, name=f"flow_{i}_{k}")
+
+        for i, j in x:
+            for k in commodities:
+                model.addConstr(f[i, j, k] <= x[i, j], name=f"cap_{i}_{j}_{k}")
+
         pass
 
     model.setObjective(
