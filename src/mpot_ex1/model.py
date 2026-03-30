@@ -16,8 +16,14 @@ def create_model(model: gp.Model):
 
     nodes = list(graph.nodes())
     n = len(nodes)
-    x = model.addVars([(i, j) for i in nodes for j in nodes if i != j], vtype=GRB.BINARY, name="x")
+    x = {}
+    for i, j in graph.edges:
+        dist = graph.edges[i, j].get('weight', 0)
+        x[i, j] = model.addVar(obj=dist, vtype=gp.GRB.BINARY, name=f"x_{i}_{j}")
+
+    # ATTACH TO MODEL FOR MAIN.PY TO ACCESS
     model._x = x
+    
     # add reference to relevant variables for later use outside this function (e.g., reading solutions)
     # m._x = x
 
