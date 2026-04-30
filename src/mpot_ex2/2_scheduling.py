@@ -104,4 +104,11 @@ if __name__ == "__main__":
     model.update()
     model.optimize()
 
+    S = model._S
+    machine_names = ["A", "B", "C", "D"]
+
+    for h in range(n_machines):
+        order = sorted(range(n_jobs), key=lambda j: S[j, h].X)
+        print(f"{machine_names[h]}: {' -> '.join(str(j+1) for j in order)}")
+        
     model.close()
